@@ -14,10 +14,24 @@ score0El.textContent = 0; //reseting score ui to 0
 score1El.textContent = 0; // same as above
 diceEl.classList.add("hidden"); //hide dice at 1st move
 
-const scores = [0, 0]; //array that will contain the active player through index
-let currentScore = 0;
-let activePlayer = 0; //used on the array scores above. values will always be 0 or 1 and it will be the index of the above array
-let playing = true; //so that we can play or stop the game as we want
+let scores, currentScore, activePlayer, playing;
+
+const init = function () {
+  scores = [0, 0]; //array that will contain the active player through index
+  currentScore = 0;
+  activePlayer = 0; //used on the array scores above. values will always be 0 or 1 and it will be the index of the above array
+  playing = true; //so that we can play or stop the game as we want
+
+  score0El.textContent = "0";
+  score1El.textContent = "0";
+  current0El.textContent = "0";
+  current1El.textContent = "0";
+  player0El.classList.remove("player--winner");
+  player1El.classList.remove("player--winner");
+  player1El.classList.remove("player--active");
+  player0El.classList.add("player--active");
+};
+init(); //executes init function on load
 
 const switchPlayer = function () {
   //switch to next player and reset score //DRY method!
@@ -40,7 +54,7 @@ btnRoll.addEventListener("click", function () {
     diceEl.classList.remove("hidden");
     diceEl.src = `dice-${dice}.png`; //shows dice with the const dice calculation above
 
-    //check if rolled 1.
+    //check if dice rolled is different then 1
     if (dice !== 1) {
       currentScore += dice; //saves the dice calculation above inside the currentscore variable. also, adds it again if we roll again due to += which means currentScore += currentscore + dice
       document.getElementById(`current--${activePlayer}`).textContent =
@@ -59,7 +73,6 @@ btnHold.addEventListener("click", function () {
     scores[activePlayer] += currentScore; //index 0 or 1. if active player 0 then adds current score to array. if active player 1 then adds current score to array
     document.getElementById(`score--${activePlayer}`).textContent = //shows currentscore
       scores[activePlayer];
-    switchPlayer(); //when hold button is pressed it switches player
 
     //check if player score is above 100
     if (scores[activePlayer] >= 100) {
@@ -75,3 +88,5 @@ btnHold.addEventListener("click", function () {
     }
   }
 });
+
+btnNew.addEventListener("click", init); //restarts game with init function
