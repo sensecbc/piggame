@@ -10,57 +10,68 @@ const btnHold = document.querySelector(".btn--hold");
 const player0El = document.querySelector(".player--0");
 const player1El = document.querySelector(".player--1");
 
-score0El.textContent = 0;
-score1El.textContent = 0;
-diceEl.classList.add("hidden");
+score0El.textContent = 0; //reseting score ui to 0
+score1El.textContent = 0; // same as above
+diceEl.classList.add("hidden"); //hide dice at 1st move
 
-const scores = [0, 0];
+const scores = [0, 0]; //array that will contain the active player through index
 let currentScore = 0;
-let activePlayer = 0;
+let activePlayer = 0; //used on the array scores above. values will always be 0 or 1 and it will be the index of the above array
+let playing = true; //so that we can play or stop the game as we want
 
 const switchPlayer = function () {
-  //switch to next player
+  //switch to next player and reset score //DRY method!
   document.getElementById(`current--${activePlayer}`).textContent = 0;
   currentScore = 0;
-  activePlayer = activePlayer === 0 ? 1 : 0; // else = if the dice is = 1. if dice = 1 then the activeplayer must change. if the active player is 0 then change to 1 if not then change to 0
-  player0El.classList.toggle("player--active"); //since we start player0 with the active player class we can toggle between them
-  player1El.classList.toggle("player--active"); //since we start player0 with the active player class we can toggle between them
+  activePlayer = activePlayer === 0 ? 1 : 0; // if active player is 0 then changes to 1. else = if the dice is = 1. if dice = 1 then the activeplayer must change. if the active player is 0 then change to 1 if not then change to 0
+  player0El.classList.toggle("player--active"); //since we start the game with player0 with on active player class we can toggle between them
+  player1El.classList.toggle("player--active"); //since we start the game with player0 with on active player class we can toggle between them
 };
 
 //rolling dice functionality
 btnRoll.addEventListener("click", function () {
   //generate random dice roll
-  const dice = Math.trunc(Math.random() * 6) + 1;
+  if (playing) {
+    //if playing = true
+    //while playing is true then the game resumes
+    const dice = Math.trunc(Math.random() * 6) + 1;
 
-  //display dice
-  diceEl.classList.remove("hidden");
-  diceEl.src = `dice-${dice}.png`; //shows dice with the const dice calculation
+    //display dice
+    diceEl.classList.remove("hidden");
+    diceEl.src = `dice-${dice}.png`; //shows dice with the const dice calculation above
 
-  //check if rolled 1. if 1 is rolled switch player and reset current player score
-  if (dice !== 1) {
-    currentScore += dice;
-    document.getElementById(`current--${activePlayer}`).textContent =
-      currentScore;
-  } else {
-    switchPlayer();
+    //check if rolled 1.
+    if (dice !== 1) {
+      currentScore += dice; //saves the dice calculation above inside the currentscore variable. also, adds it again if we roll again due to += which means currentScore += currentscore + dice
+      document.getElementById(`current--${activePlayer}`).textContent =
+        currentScore; //updates ui with the current score
+
+      //if 1 is rolled switch player and reset current player score
+    } else {
+      switchPlayer();
+    }
   }
 });
 
 btnHold.addEventListener("click", function () {
   //add current score to active players score
-  scores[activePlayer] += currentScore; //index 0 or 1. if active player 0 then adds current score to array. if active player 1 then adds current score to array
-  document.getElementById(`score--${activePlayer}`).textContent = //shows currentscore
-    scores[activePlayer];
-  switchPlayer();
+  if (playing) {
+    scores[activePlayer] += currentScore; //index 0 or 1. if active player 0 then adds current score to array. if active player 1 then adds current score to array
+    document.getElementById(`score--${activePlayer}`).textContent = //shows currentscore
+      scores[activePlayer];
+    switchPlayer(); //when hold button is pressed it switches player
 
-  if (scores[activePlayer] >= 100) {
-    document
-      .querySelector(`.player--${activePlayer}`)
-      .classList.add("player--winner");
-    document
-      .querySelector(`.player--${activePlayer}`)
-      .classList.remove("player--active");
-  } else {
-    switchPlayer();
+    //check if player score is above 100
+    if (scores[activePlayer] >= 100) {
+      playing = false; //if it indeed is above 100 then stop game
+      document
+        .querySelector(`.player--${activePlayer}`) //add the the winner ui
+        .classList.add("player--winner");
+      document
+        .querySelector(`.player--${activePlayer}`)
+        .classList.remove("player--active"); //remove the active player ui
+    } else {
+      switchPlayer(); //if we press hold and it isn't above 100 then switch player.
+    }
   }
 });
